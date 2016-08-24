@@ -2,6 +2,8 @@ import numpy as np
 import pylab as pl
 
 
+#see figure 12-11, page 127 of book Data science : fondamentaux et etudes de cas
+# for analysis of graph
 def gb_diagnose(X, gb, params):
     """
     gradiant boosting
@@ -31,3 +33,9 @@ def gd_fit(df):
     #first normalize input data
     scaler = StandardScaler()
     df_normalized = scaler.fit_transform(df)
+
+
+    #normalization should consist of 2 things :
+    #  - assign a value to missing fields ( median=Q2, mean, 0, ..)
+    #  - take care of outliers ( valeurs aberrantes  sup or inf to 1.5 ecart interquartile)
+    #      ecart interquartile = Q3 - Q1
