@@ -1,0 +1,27 @@
+tcabel@fantasy:/home/tcabel/To....0-bin-hadoop2.7$ ./bin/spark-shell
+scala> val textFile = sc.textFile("README.md")
+textFile: org.apache.spark.rdd.RDD[String] = README.md MapPartitionsRDD[1] at textFile at <console>:24
+
+scala> textFile.count()
+res0: Long = 99
+
+scala> textFile.first()
+res1: String = # Apache Spark
+
+scala> val linesWithSpark = textFile.filter(line => line.contains("Spark"))
+linesWithSpark: org.apache.spark.rdd.RDD[String] = MapPartitionsRDD[2] at filter at <console>:26
+
+scala> textFile.filter(line => line.contains("Spark")).count()
+res2: Long = 19
+
+scala> textFile.map(line => line.split(" ").size).reduce((a, b) => if (a > b) a else b)
+res3: Int = 22
+
+scala> val wordCounts = textFile.flatMap(line => line.split(" ")).map(word => (word, 1)).reduceByKey((a, b) => a + b)
+wordCounts: org.apache.spark.rdd.RDD[(String, Int)] = ShuffledRDD[7] at reduceByKey at <console>:26
+
+scala> wordCounts.collect()
+res4: Array[(String, Int)] = Array((package,1), (this,1), (Version"](http://spark.apache.org/docs/latest/building-spark.html#specifying-the-hadoop-version),1), (Because,1), (Python,2), (cluster.,1), (its,1), ([run,1), (general,2), (have,1), (pre-built,1), (YARN,,1), (locally,2), (changed,1), (locally.,1), (sc.parallelize(1,1), (only,1), (Configuration,1), (This,2), (basic,1), (first,1), (learning,,1), ([Eclipse](https://cwiki.apache.org/confluence/display/SPARK/Useful+Developer+Tools#UsefulDeveloperTools-Eclipse),1), (documentation,3), (graph,1), (Hive,2), (several,1), (["Specifying,1), ("yarn",1), (page](http://spark.apache.org/documentation.html),1), ([params]`.,1), ([project,2), (prefer,1), (SparkPi,2), (<http://spark.apache.org/>,1), (engine,1), (version,1), (file,1), (documentation...
+
+wordCounts.map(item => item.swap).sortByKey(false).collect()
+res17: Array[(Int, String)] = Array((68,""), (22,the), (15,Spark), (14,to), (11,for), (11,and), (8,##), (8,a), (7,can), (7,run), (6,is), (6,in), (5,using), (5,on), (5,of), (4,build), (4,with), (4,also), (4,if), (4,an), (4,You), (4,you), (3,documentation), (3,example), (3,Please), (3,one), (3,For), (3,including), (3,use), (3,or), (3,see), (3,Hadoop), (2,Python), (2,general), (2,locally), (2,This), (2,Hive), (2,[project), (2,SparkPi), (2,refer), (2,Interactive), (2,how), (2,Scala), (2,detailed), (2,return), (2,Shell), (2,class), (2,Python,), (2,set), (2,building), (2,SQL), (2,guidance), (2,cluster), (2,shell:), (2,supports), (2,particular), (2,following), (2,which), (2,should), (2,To), (2,be), (2,do), (2,./bin/run-example), (2,It), (2,1000:), (2,tests), (2,examples), (2,at), (2,`examples`...
