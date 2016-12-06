@@ -62,3 +62,32 @@ We have seen that quite a few parameters needs to be tuned:
  - weight initialization
  
  But when things are not working, the first thing to do if often to lower the learning rate! We can also look at **ADAGRAD** which is a tuning of SGD doing momentum and learning rate decay automatically.
+
+### Linear model complexity
+In general, if we have N inputs features and K outputs, linear models will need (N+1)K parameters.
+
+
+# Deep Neural networks
+We want to introduce some non linearity, for this we need non-linear functions. The first of it being **ReLU** .
+
+### Rectified Linar Unit (ReLU)
+Its the simplest non linear function, it's $$y=max(0,x)$$
+
+### first network
+With this function, we can build our first network! Let's start from our previous model 
+```
+X -> linear model ( Y=WX+b ) -> softmax (S(Y)) 
+```
+Our first neural network (2-layers) will be 
+```
+X -> linear model ( Y=WX+b ) -> ReLU(Y_2=max(0,Y)) -> -> linear model ( Y_3=W_2*Y_2+b_2 ) -> softmax (S(Y_3))
+```
+The first layer is `Y=WX+b -> ReLU(Y)`
+We will need to choose how many ReLU units we want and that's it!
+
+### back propagation
+to train our network, we will use back-propagation. Some functions like ReLU don't need to be trained (blank in the graph), for other we will use chain rules: *the derivative of f(g(x)) is g'(f(x)) * f'(x)*
+
+![back_propagation](back_propagation.png)
+
+second assignment notebook **2_fullyconnected**
