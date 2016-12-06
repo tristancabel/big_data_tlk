@@ -91,3 +91,17 @@ to train our network, we will use back-propagation. Some functions like ReLU don
 ![back_propagation](back_propagation.png)
 
 second assignment notebook **2_fullyconnected**
+
+Then, it's quite straitforward to have a deeper network adding more layers. Usually, we will get better performances with a deeper network than with a larger one.
+
+### regularization
+
+We can do **early termination**, meaning stopping the training when validation set performances start to decrease. It will prevent too much overfitting. Another thing to do is **regularization**: applying artificial constraints on your network that implicitely reduce the number of free parameters while not making it more difficult to optimize. 
+
+#### L2 regularization
+L2 regularization is $$L' = L + \beta \frac{1}{2} \norm{W}_2^2$$ The idea is to add a term to the loss that minimize large weights. Note that the derivative of the second term is just $$W$$ !
+
+#### dropout
+Another recent technique for regularization that works well is **dropout**. It consist of randomly deactivate some activation (boxes) for each training example (50% or less). It ensure that your network cannot rely on any specific activation because they might get squashed at any given moment. So it forces the network to be somewhat redundant.
+
+With dropout, we want to take the consensus over these redundant models aka averaging the output of the different models. $$Y_e ~ E(Y_t)$$ with *e* standing for evaluation and *t* for training
