@@ -92,16 +92,55 @@ to train our network, we will use back-propagation. Some functions like ReLU don
 
 second assignment notebook **2_fullyconnected**
 
-Then, it's quite straitforward to have a deeper network adding more layers. Usually, we will get better performances with a deeper network than with a larger one.
+Then, it's quite straightforward to have a deeper network adding more layers. Usually, we will get better performances with a deeper network than with a larger one.
 
 ### regularization
 
 We can do **early termination**, meaning stopping the training when validation set performances start to decrease. It will prevent too much overfitting. Another thing to do is **regularization**: applying artificial constraints on your network that implicitely reduce the number of free parameters while not making it more difficult to optimize. 
 
 #### L2 regularization
-L2 regularization is $$L' = L + \beta \frac{1}{2} \norm{W}_2^2$$ The idea is to add a term to the loss that minimize large weights. Note that the derivative of the second term is just $$W$$ !
+L2 regularization is $$L_2 = L + \beta \frac{1}{2} \norm{W}_2^2$$ The idea is to add a term to the loss that minimize large weights. Note that the derivative of the second term is just $$W$$ !
 
 #### dropout
 Another recent technique for regularization that works well is **dropout**. It consist of randomly deactivate some activation (boxes) for each training example (50% or less). It ensure that your network cannot rely on any specific activation because they might get squashed at any given moment. So it forces the network to be somewhat redundant.
 
 With dropout, we want to take the consensus over these redundant models aka averaging the output of the different models. $$Y_e ~ E(Y_t)$$ with *e* standing for evaluation and *t* for training
+
+# Convolutional Neural Network (CNN)
+
+## statistical invariance
+Sometimes some features we get are not usefull for the learning we want to do! For example, if we want to guess which letter from the alphabet an image is, the color of this letter is not usefull. In the same way, if want to know if a picture represents a cat, the position of the cat in the image (left upper corner or center or .. ) is not usefull! In this later case, we want to tell our network to apply some **translation invariance**.
+
+The way to achieve this in a network is using **weight sharing**: when we know that two inputs can contain the same kind of information, then we share the weights and train the weights jointly ofr these inputs.
+
+## convnets
+Convnets of convolutional networks are neural networks that share their parameters across space.
+For an image, it's like sliding the same network on small sets of the image (sliding a kernel over patches of the image with a stride of few pixels). Instead of a stack of matrix multiply layers, we'are going to have stacks of convolutions with the general idea of them forming a pyramid. For example taking an RGB image of 256*256 pixels, we could apply the following network:
+`Input(256x256x3) -> h1(128x128x16) -> h2(64x64x64) -> h3(32x32x64) -> classifier`
+
+We increase the depth at each steps considering it roughly represents the semantic complexity of our representation.
+
+## advanced convnets
+there is a lot of things we can do to improve our convnets. We will talk about **polling**, and **inception**.
+
+### polling 
+It's a better way to reduce the feature maps in the convolutional pyramid. Until now, we have used striding to shift the filters by a few pixel each time and reduce the feature map size.
+What if we still do some striding with a low number (like 1) but then took all the convolutions in a neighborhood and combined them somehow! It's **polling**. We can do:
+
+ - *max polling* Y = max(X_i) . It's parameter free, often more accurate but it's more expensive and it's need more hyper parameters (pooling size, pooling stride).
+ - *average pooling* it's ike taking a blurred biew.
+ - *1x1 convolution* adding a 1x1 convolution allows us to have a mini neural network running over the patch instead of a linear classifier: ` Input(KxKx3) -> h_1(ixixL) -> h_2(1x1xM)` . they are relatively cheap 
+
+### inception
+The idea is at each layer of your convnet, you can make a choice: have a pooing operation, have a convoution. Then you need to decide is it a 1x1, 3x3, a 5x5. But all of them can be beneficial so why choose, let's use them all and concatenate the result! 
+
+assignment 4
+
+# Deep models for text analysis
+Text analysis is a good problem to tackle because it's complex.
+
+A first example of complexity is some words are more important than others: if you find "name" in a text, it doesn't give too much insight of what the text is about. However, if we find "retinopathy", we can guess it's a medical text. But retinopathy appears only in a frequency of 0.0001% in english!  That's very hard to train a network to correcty handle cases for which there is not many examples!
+
+Another example of complexity is multiple words can mean the same or almost the same thing like "cat" or "kitty". So we sould like to share parameters of cases like this, but cat is completely different from kitty! So we have to learn that they are related.
+
+To solve that problem, we are going to turn to **unsupervised learning** ! It's training without any label.
