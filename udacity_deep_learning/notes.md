@@ -118,7 +118,9 @@ Convnets of convolutional networks are neural networks that share their paramete
 For an image, it's like sliding the same network on small sets of the image (sliding a kernel over patches of the image with a stride of few pixels). Instead of a stack of matrix multiply layers, we'are going to have stacks of convolutions with the general idea of them forming a pyramid. For example taking an RGB image of 256*256 pixels, we could apply the following network:
 `Input(256x256x3) -> h1(128x128x16) -> h2(64x64x64) -> h3(32x32x64) -> classifier`
 
-We increase the depth at each steps considering it roughly represents the semantic complexity of our representation.
+We increase the depth at each steps considering it roughly represents the semantic complexity of our representation. 
+
+Good explanation of conv2d in tensorflow in [stackoverflow](http://stackoverflow.com/questions/34619177/what-does-tf-nn-conv2d-do-in-tensorflow).
 
 ## advanced convnets
 there is a lot of things we can do to improve our convnets. We will talk about **polling**, and **inception**.
@@ -128,11 +130,11 @@ It's a better way to reduce the feature maps in the convolutional pyramid. Until
 What if we still do some striding with a low number (like 1) but then took all the convolutions in a neighborhood and combined them somehow! It's **polling**. We can do:
 
  - *max polling* Y = max(X_i) . It's parameter free, often more accurate but it's more expensive and it's need more hyper parameters (pooling size, pooling stride).
- - *average pooling* it's ike taking a blurred biew.
- - *1x1 convolution* adding a 1x1 convolution allows us to have a mini neural network running over the patch instead of a linear classifier: ` Input(KxKx3) -> h_1(ixixL) -> h_2(1x1xM)` . they are relatively cheap 
+ - *average pooling* it's ike taking a blurred view.
+ - *1x1 convolution* adding a 1x1 convolution allows us to have a mini neural network running over the patch instead of a linear classifier: ` Input(KxKx3) -> h_1(ixixL) -> h_2(1x1xM)` . they are relatively cheap and add some non-linearity.
 
 ### inception
-The idea is at each layer of your convnet, you can make a choice: have a pooing operation, have a convoution. Then you need to decide is it a 1x1, 3x3, a 5x5. But all of them can be beneficial so why choose, let's use them all and concatenate the result! 
+The idea is at each layer of your convnet, you can make a choice: have a pooling operation or have a convolution. Then you need to decide is it a 1x1, 3x3, a 5x5. But all of them can be beneficial so why choose, let's use them all and concatenate the result! 
 
 assignment 4
 
@@ -143,4 +145,35 @@ A first example of complexity is some words are more important than others: if y
 
 Another example of complexity is multiple words can mean the same or almost the same thing like "cat" or "kitty". So we sould like to share parameters of cases like this, but cat is completely different from kitty! So we have to learn that they are related.
 
-To solve that problem, we are going to turn to **unsupervised learning** ! It's training without any label.
+To solve that problem, we are going to turn to **unsupervised learning** ! It's training without any label. 
+
+## embeddings
+We will take the hypothetis that similar words tend to occur in similar contexts and so we are going to identify contexts! We are going to use embeddings to map words to small vectors which are going to be close to each other when words have similar meanings and far apart when they don't. It allows us to have a representation where all the catlike things like cats, kitties, kittens are all represented by vectors that are very similar.
+
+For comparing embeddings, because of the way they are trained, it's often better to measure the closeness using a cosine distance instead of L2:
+
+ - cosine distance: $$cosine = \frac{V_cat . V_kitten}{ \norm{V_cat} \norm{V_kitten}}$$
+ - L2: $$L2 = \norm{V_cat - V_kitten}^2_2$$
+ 
+ That's because the length of the embedding vector is not relevant to the classification.
+
+## word2vec
+It's a surprisingly simple model that works very well. Let's take the sentence `the quick brown fox uumps over the lazy dog`. For each word in this sentence, we are going to map it to an embedding. Then we are going to use that embedding to try to predict the context of the word. In this model, the context is simply the words that are nearby. We will define a *window size* to choose how many nearby words to take. Then, train the network to try to predict the word given words in the window.
+So a basic model will be:
+```
+CAT -> V_cat=Embedding(CAT) -> LM = WV_cat + b -> S=softmax(LM)  ->  y = cross_entropy( S, vocabulary) 
+
+```
+
+## sampled softmax
+A problem we will have is that our vocabulary is quite big so computing the softmax function over all these can be quite long but there is a trick. Instead of treating the softmax as is the label had probability of 1 and evry other word has probability of 0, we can sample the words that are not the target ond only pick a handful of them and act as if the other words were not there. This idea of sampling the negative targets for each example if often called **sampled softmax**.
+
+## t-SNE
+If we want to check the representation of our embedding, we may be tempted to reduce the dimensionality to 2 or 3 (2D or 3D) using **PCA**. However, with **PCA** we will lose too much information so it's best to us **t-SNE**. Things that are close in the embedding space should remain close to the ends and things that are far should be far from each other.
+
+
+## Analogies
+With this vector representation, we can do funny things:
+
+ - semantic analogy `puppy - dog + kat -> kitten`
+ - syntactic analogy `taller - tall + short -> shorter`
