@@ -177,3 +177,36 @@ With this vector representation, we can do funny things:
 
  - semantic analogy `puppy - dog + kat -> kitten`
  - syntactic analogy `taller - tall + short -> shorter`
+
+# Recurrent Neural Networks
+However in the current model, we use fixed windows size but text or speech sentences don't always gave the same size! We will now introduce **Recurrent Neural Networks**. The idea is instead using the same network across space, let's use it across time. A basic RNN cell looks like this:
+```
+
+          Y
+          ^
+        __|__
+        |   |
+PAST -> | W | -> FUTURE 
+        |___|
+          |
+          X
+```
+With *X* as input, *Y* as output, and *W* as our network for one time step.
+
+## back-propagation through time
+Since we back-propagate through time, it means that there will be a lot of correlated updates to the same weigth at the same time. It's bad for Stochastic Gradient Descent (SGD) as this algorithm prefers to have uncorrelated updates to its parameters, for the stability of the training. This makes the math very unstable: either the gradient grow exponentially and we end up with infinities or they vanish to zero very quickly. It's the *exploding or vanishing gradient problem*.
+
+In order to solve the exploding gradient problem, we are going to use **gradient cipping**: compute the norm of the gradient and shrink their step when the norm grow too big.
+
+To solve the gradient vanishing problem (which can be describe as memory loss in RNNs aka the model only remenber recent events) we are going to use **LSTM**.
+
+## Long Short-Term Memory (LSTM)
+A simple model of memory should be able to do 3 things: Read, Write, and Forget. A LSTM is simply adding this simple idea of memory to our network. So we will partially add some of X to our memory  (using a continous/differentiable function), we will partially read some of our memory, and we will partially forget some of our memory at each time step. We use a continous/differentiable function so that we can train it through back-propagation. We will also add a *tanh* regularization at reading time to keep our read between [-1.0, 1.0].
+
+For LSTM, we can use L2 or dropout as regularization but only on the input(X) or the output(Y), not on the past or the future.
+
+## Beam search
+Once the network is ready, we can use it to predict the future for example, the next character of `The quick br` . We will have a list of characters with their associated probability: [(A,0.3), .. (O,0.4), .. ] . 
+We can also try to predict 2 or more characters and compute the probability of having `AA` for example P(A)*P(A|A) . It will prevent us for making a decision then finds out it wasn't a good one but still being stuck with it. 
+
+Of course, it becomes quite greedy and it's where **beam serach** comes in. Insted of taking all the possible characters, we will just select a handfull of them.
