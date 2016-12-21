@@ -104,6 +104,8 @@ L2 regularization is $$L_2 = L + \beta \frac{1}{2} \norm{W}_2^2$$ The idea is to
 #### dropout
 Another recent technique for regularization that works well is **dropout**. It consist of randomly deactivate some activation (boxes) for each training example (50% or less). It ensure that your network cannot rely on any specific activation because they might get squashed at any given moment. So it forces the network to be somewhat redundant.
 
+It's a good technique to avoid having lots of neuron with weights of 0.
+
 With dropout, we want to take the consensus over these redundant models aka averaging the output of the different models. $$Y_e ~ E(Y_t)$$ with *e* standing for evaluation and *t* for training
 
 # Convolutional Neural Network (CNN)
