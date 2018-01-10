@@ -74,3 +74,6 @@ target/
 
 # pyenv
 .python-version
+
+data
+model
