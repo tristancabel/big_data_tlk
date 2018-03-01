@@ -1,1 +1,5 @@
 flower_photos*
+imagenet-vgg*
+mnist
+*/checkpoints
+*/graphs
